@@ -1,0 +1,35 @@
+Marcu Nicolescu Cezar George
+
+
+(Am pus comentarii pe unde mi s-a parut mai greu de inteles codul)
+
+ClassState.hs ->
+
+ClassState-ul este o lista de obiecte (pos) ce pot fi variabile sau functii
+
+In functia insertIntoClass pentru variabile, cum stim din definitia acestora ca au 2 parametrii(tipul si numele) , am expandat lista de parametrii pentru cele 2 Stringuri -> [x,y] = param , ca apoi sa adaug in clasa
+Pentru functii , stim ca acestea pot sa primeasca o lista de parametrii , deci separ numele si tipul acestora de restul elementelor din lista de stringuri param si incep inserarea propriu zisa.
+
+In getValues , in cazul in care instruction type-ul este "Var" si corespunde cu elementul din ClassState (si obiectul curent are instruction type-ul tot var) adaug obiectul in lista de variabile.
+In cazul in care instruction type-uri-le nu corespund , merg mai departe prin Classtate pana dau de urmatorul obiect de tip variabila (cu instr type-ul var)
+
+Acelasi lucru fac si pt functii (verific instrType-ul elementului curent din ClassState si daca corespund adaug in lista de obiecte)
+
+Parser.hs ->
+
+Program-ul este o lista de clasa , iar clasa am definit-o ca fiind gruparea dintre un ClassState(lista de variabile / functii) + numele acesteia + parintele pe care il extinde
+Instruction-ul = o lista de cuvinte
+
+In getVars parcurg programul luand fiecare clasa la rand si adaug in lista variabile cu ajutorul functiei definite in ClassState.hs
+
+getClasses : merg prin lista de clase (program) si construiect o lista cu numele fiecarei clase
+
+getParentClass : parcurg "Programul" si verific daca am gasit clasa al carei nume corespunde cu cea data ca parametru , iar in caz afirmativ returnez parintele acesteia
+
+getFuncsForClass : parcurg "Programul" , verific numele egalitatea dintre numele dat ca parametru si cel al clasei , iar , daca corespund, apelez getValues pentru instruction type-ul func pe clasa respectiva
+
+In parse , in lista lin retin fiecare linie din text (parsez dupa \n) si apoi imi construiesc o lista pentru fiecare cuvant al liniei (parsez dupa delimitatori : " ():=,")
+
+In parsareCuv , am folosit 2 acumulatori , primul ,y, pentru a construi caracter cu caracter cuvantul , iar al 2-lea ,list, pentru a forma lista de cuvinte . Am verificat daca fiecare caracter este element din delimitatori , iar in caz afirmativ , adaug y-ul la lista si continui parcurgerea textului primit ca parametru. Daca caracterul curent nu este delimitator , atunci construiesc in continuare y-ul.
+
+Interpretul l-am explicat in detaliu in cod . In mare ,acesta verifica ce este prima instructiune (clasa/variabila/functie) , daca este clasa , vede cate instructiuni sunt (cu acel length) pentru a putea face mostenirile pentru clasele ce au parinti si verifica existenta atat a clasei curente(pentru a nu exista dublicate) cat si a parintelui (sa nu suprascrie o clasa deja definita cu un parinte) si construieste clasele in functie de situatie . Variabilele le-am adaugat in clasa Global dupa ce am verificat daca tipul lor exista ca si clasa , iar la functii a trebuit sa verific daca fiecare instructiune primita , mai putin numele, este clasa inainte de a face inserarea.
